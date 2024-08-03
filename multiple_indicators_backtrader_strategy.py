@@ -1,11 +1,17 @@
-from __future__ import (absolute_import, division, print_function, unicode_literals)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 # Import the backtrader platform
 import backtrader as bt
+
 
 # Create a Stratey
 class TestStrategy(bt.Strategy):
@@ -28,7 +34,17 @@ class TestStrategy(bt.Strategy):
         self.buycomm = None
 
         # Add a MovingAverageSimple indicator
-        self.sma = bt.indicators.SimpleMovingAverage(self.datas[0], period=self.params.maperiod)
+        self.sma = bt.indicators.SimpleMovingAverage(
+            self.datas[0], period=self.params.maperiod)
+
+        # Indicators for the plotting show
+        bt.indicators.ExponentialMovingAverage(self.datas[0], period=25)
+        bt.indicators.WeightedMovingAverage(self.datas[0], period=25, subplot=True)
+        bt.indicators.StochasticSlow(self.datas[0])
+        bt.indicators.MACDHisto(self.datas[0])
+        rsi = bt.indicators.RSI(self.datas[0])
+        bt.indicators.SmoothedMovingAverage(rsi, period=10)
+        bt.indicators.ATR(self.datas[0], plot=False)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -58,6 +74,7 @@ class TestStrategy(bt.Strategy):
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
 
+        # Write down: no pending order
         self.order = None
 
     def notify_trade(self, trade):
@@ -106,8 +123,8 @@ if __name__ == '__main__':
 
     # Datas are in a subfolder of the samples. Need to find where the script is
     # because it could have been called from anywhere
-    modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
-    datapath = os.path.join(modpath, 'datas/orcl-1995-2014.txt')
+    # modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+    datapath = 'datas/orcl-1995-2014.txt'
 
     # Create a Data Feed
     data = bt.feeds.YahooFinanceCSVData(
@@ -139,3 +156,10 @@ if __name__ == '__main__':
 
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+    # Plot the result
+    plt.rcParams['figure.figsize'] = [20, 10]
+    fig = cerebro.plot()[0][0]
+
+    # Save the plot to a file
+    fig.savefig('backtrader_plot_multiple_indicators.png')

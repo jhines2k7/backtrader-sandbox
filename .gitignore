@@ -1,4 +1,5 @@
-.backtrader
+.backtrader-sandbox
 yahoo-data
 datas
 logs
+*.png

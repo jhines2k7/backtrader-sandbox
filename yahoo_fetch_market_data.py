@@ -11,26 +11,22 @@ start_date = end_date - timedelta(days=6)
 # Define the path to the data folder
 data_folder = 'yahoo-data'
 
-# Delete the data folder if it exists
-if os.path.exists(data_folder):
-    shutil.rmtree(data_folder)
-
-# Recreate the data folder
-os.makedirs(data_folder)
+# create the data folder if it exists
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
 
 symbols = [
-    'EURUSD'
-    # 'GBPUSD',
-    # 'EURUSD',
-    # 'USDCHF',
-    # 'USDJPY',
-    # 'USDCAD',
-    # 'AUDUSD',
-    # 'EURJPY',
-    # 'GBPJPY',
-    # 'GBPCHF',
-    # 'USDMXN',
-    # 'EURGBP'
+    'GBPUSD',
+    'EURUSD',
+    'USDCHF',
+    'USDJPY',
+    'USDCAD',
+    'AUDUSD',
+    'EURJPY',
+    'GBPJPY',
+    'GBPCHF',
+    'USDMXN',
+    'EURGBP'
 ]
 
 for symbol in symbols:
@@ -39,7 +35,6 @@ for symbol in symbols:
 
     # Convert index to datetime and then to seconds since the epoch
     data.reset_index(inplace=True)
-    data['Datetime'] = pd.to_datetime(data['Datetime'])
     data.set_index('Datetime', inplace=True)
 
     # Save to CSV
